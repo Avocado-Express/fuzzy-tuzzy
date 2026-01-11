@@ -1,0 +1,1 @@
+The name was inspired from [snuggy](https://archiveofourown.org/works/44918293)
