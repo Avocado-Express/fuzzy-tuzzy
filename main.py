@@ -1,11 +1,6 @@
-from pydantic_cli import run_and_exit, Cmd
+from pydantic_cli import run_and_exit
 from config import TOMLConfig
-
-
-class Options(Cmd):
-
-    def run(self) -> None:
-        print("Mock example running with ")
+from arguments import Options
 
 
 if __name__ == "__main__":

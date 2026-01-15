@@ -1,13 +1,6 @@
 
 # Enable or disable sanitizers
-[sanitisers]
-asan = true
-masn = true
-ubsan = true
-cfisan = true
-tasn = true
-lsan = true
-hardened = true
+sanitisers=true
 
 # Enable or disable instrumentation
 [instrumentation]

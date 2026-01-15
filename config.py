@@ -12,16 +12,6 @@ from typing import Tuple, Type, Optional
 Percentage = Field(None, ge=0, le=1)
 
 
-class Sanitisers(BaseModel):
-    asan: bool
-    masn: bool
-    ubsan: bool
-    cfisan: bool
-    tasn: bool
-    lsan: bool
-    hardened: bool
-
-
 class Instrumentation(BaseModel):
     laf: bool
 
@@ -51,7 +41,7 @@ class PowerSchedule(BaseModel):
 class TOMLConfig(BaseSettings):
     model_config = SettingsConfigDict(toml_file="config.toml")
 
-    sanitisers: Sanitisers
+    sanitisers: bool
     instrumentation: Instrumentation
     secondary_options: SecondaryOptions
     power_schedule: PowerSchedule
