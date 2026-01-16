@@ -7,7 +7,7 @@ BINARY_NAMES = ['normal', 'san1', 'san2', 'san3']
 
 class Arguments(BaseModel):
     binary_directory: Path
-    seeds: Path
+    corpus: Path
     output: Path
     dictionary: Optional[Path] = None
 
@@ -22,7 +22,7 @@ class Arguments(BaseModel):
                 raise ValueError(f"Expected binary '{name}' not found in {v}")
         return v
 
-    @field_validator('seeds', 'output')
+    @field_validator('corpus', 'output')
     def validate_paths(cls, v: Path) -> Path:
         if not v.exists() or not v.is_dir():
             raise ValueError("Path must be an existing directory")
