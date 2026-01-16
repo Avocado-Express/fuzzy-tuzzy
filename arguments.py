@@ -14,7 +14,7 @@ class Arguments(BaseModel):
     @field_validator('binary_directory')
     def validate_binaries(cls, v: Path) -> Path:
         if not v.exists() or not v.is_dir():
-            raise ValueError("binary_directory path must be an existing directory")
+            raise ValueError("binary_directory path must be valid directory")
 
         for name in BINARY_NAMES:
             binary_path = v / name

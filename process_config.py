@@ -2,9 +2,9 @@ from config import TOMLConfig
 from multiprocessing import cpu_count
 from afl_option import SAND, AFLOption, CMPLOG
 from random import choice
-import os
 from pathlib import Path
-from typing import Optional, Any
+from typing import Optional
+from arguments import Arguments
 from pydantic import BaseModel
 
 
@@ -18,7 +18,7 @@ class Core(BaseModel):
     #     self.options.append(option)
 
 
-def process_config(config: TOMLConfig, options: Any) -> list[Core]:
+def process_config(config: TOMLConfig, arguments: Arguments) -> list[Core]:
 
     def add_to_random_core(option: AFLOption) -> None:
         choice(fuzzers).options.append(option)
@@ -32,19 +32,21 @@ def process_config(config: TOMLConfig, options: Any) -> list[Core]:
 
     # Sanitisers
     if config.sanitisers:
-        add_to_random_core(SAND(binary_dir=options.binary_directory))
+        add_to_random_core(SAND(binary_dir=arguments.binary_directory))
 
     # Instrumentation
     if config.instrumentation.laf:
+        laf_binary_path = arguments.binary_directory / 'laf'
         # Check file exists
-        if not (options.binary_directory / 'laf').exists():
+        if not (laf_binary_path).exists():
             raise FileNotFoundError(
-                f"LAF binary not found at {options.binary_directory / 'laf'}"
+                f"LAF binary not found at {laf_binary_path}"
             )
-        choice([f for f in fuzzers if f.binary is None]).binary = options.binary_directory / 'laf'
+        choice([f for f in fuzzers if
+                f.binary is None]).binary = laf_binary_path
 
     if config.instrumentation.cmplog:
-        cmplog_binary_path = options.binary_directory / 'cmplog'
+        cmplog_binary_path = arguments.binary_directory / 'cmplog'
         # Check file exists
         if not (cmplog_binary_path).exists():
             raise FileNotFoundError(
