@@ -1,29 +1,22 @@
-from pydantic import field_validator
+from pydantic import field_validator, BaseModel
 from pathlib import Path
-from pydantic_cli import Cmd
 from typing import Optional
-from config import TOMLConfig
-from process_config import process_config
 
-binary_names = ['normal', 'san1', 'san2', 'san3']
+BINARY_NAMES = ['normal', 'san1', 'san2', 'san3']
 
 
-class Options(Cmd):
+class Arguments(BaseModel):
     binary_directory: Path
     seeds: Path
     output: Path
     dictionary: Optional[Path] = None
-
-    def run(self) -> None:
-        process_config(TOMLConfig(), self)
-        print("Mock example running with ")
 
     @field_validator('binary_directory')
     def validate_binaries(cls, v: Path) -> Path:
         if not v.exists() or not v.is_dir():
             raise ValueError("binary_directory path must be an existing directory")
 
-        for name in binary_names:
+        for name in BINARY_NAMES:
             binary_path = v / name
             if not binary_path.exists() or not binary_path.is_file():
                 raise ValueError(f"Expected binary '{name}' not found in {v}")
