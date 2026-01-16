@@ -14,6 +14,8 @@ Percentage = Field(None, ge=0, le=1)
 
 class Instrumentation(BaseModel):
     laf: bool
+    cmplog: bool
+    cmplog_options: Optional[list[str]] = None
 
 
 class SecondaryOptions(BaseModel):

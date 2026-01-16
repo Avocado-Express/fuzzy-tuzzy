@@ -1,5 +1,9 @@
 from pydantic import BaseModel
 from pathlib import Path
+from typing import Optional
+
+
+binary_names = ['normal', 'san1', 'san2', 'san3']
 
 
 class AFLOption(BaseModel):
@@ -14,7 +18,18 @@ class SAND(AFLOption):
 
     binary_dir: Path
 
-    # Fix me
     def get_cmdline_option(self) -> str:
-        return ' '.join(["-w {}".format(path)
-                         for path in self.sanitiser_paths])
+        return ' '.join(["-w {}".format(self.binary_dir / binary)
+                         for binary in binary_names])
+
+
+class CMPLOG(AFLOption):
+    is_environment_variable: bool = False
+
+    cmplog_binary: Path
+    cmplog_options: Optional[str] = None
+
+    def get_cmdline_option(self) -> str:
+        if self.cmplog_options is None:
+            return "-c {}".format(self.cmplog_binary)
+        return "-c {} -l {}".format(self.cmplog_binary, self.cmplog_options)
