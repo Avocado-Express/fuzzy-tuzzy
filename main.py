@@ -4,6 +4,8 @@ from pathlib import Path
 from config import TOMLConfig
 from process_config import process_config
 from arguments import Arguments
+from random import seed
+seed(0)
 
 
 def main(binary_directory: Path,
@@ -20,6 +22,4 @@ def main(binary_directory: Path,
 
 
 if __name__ == "__main__":
-    config = TOMLConfig()
-    print("Loaded configuration:", config.model_dump())
     typer.run(main)
