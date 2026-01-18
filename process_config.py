@@ -10,7 +10,7 @@ from afl_option import (
     Strategy,
     ExploreStrategy,
     ExploitStrategy,
-    Type,
+    TypeOption,
     TypeName,
     Schedule,
     ScheduleName
@@ -44,10 +44,9 @@ def process_config(config: TOMLConfig, arguments: Arguments) -> list[Core]:
         n_cores = round(percent * cores)
         return sample(fuzzers, k=n_cores)
 
-    cores = cpu_count()
+    cores = cpu_count() - 1  # Leave one core for main
     if cores < 8:
-        print("Why are trying to do this")
-        exit(1)
+        print("This is not ideal")
 
     # First one is main, rest are secondary
     fuzzers = [Core() for _ in range(cores - 1)]
@@ -110,14 +109,14 @@ def process_config(config: TOMLConfig, arguments: Arguments) -> list[Core]:
         i.options.append(ExploitStrategy())
 
     for i in random_fuzzers_by_percent(secondary_options.ascii_type):
-        i.options.append(Type(type_name=TypeName.ASCII))
+        i.options.append(TypeOption(type_name=TypeName.ASCII))
     no_type_fuzzers = [f for f in fuzzers if
-                       not any(isinstance(opt, Type)
+                       not any(isinstance(opt, TypeOption)
                                for opt in f.options)]
 
     binary_type_cores = round(secondary_options.binary_type * cores)
     for i in sample(no_type_fuzzers, k=binary_type_cores):
-        i.options.append(Type(type_name=TypeName.BINARY))
+        i.options.append(TypeOption(type_name=TypeName.BINARY))
 
     def add_schedule(schedule: Schedule) -> list[Schedule]:
         # Add schedules based on power schedule config
@@ -125,10 +124,9 @@ def process_config(config: TOMLConfig, arguments: Arguments) -> list[Core]:
         schedule_name = schedule.schedule_name
         count = getattr(config.power_schedule, schedule_name)
 
-        if count is None or count == 0:
-            return []
-        elif count == 1:
-            return []
+        # None is exactly one instance
+        if count is None:
+            count = 1
         else:
             count = round(count * cores)
 
@@ -138,9 +136,9 @@ def process_config(config: TOMLConfig, arguments: Arguments) -> list[Core]:
     for schedule in Schedule.get_all_schedules():
         power_schedules.extend(add_schedule(schedule))
 
-    for fuzzer in sample(fuzzers, k=sum(len(s) for s in power_schedules)):
+    for fuzzer in sample(fuzzers, k=len(power_schedules)):
         schedule_options = power_schedules.pop()
-        fuzzer.options.extend(schedule_options)
+        fuzzer.options.append(schedule_options)
 
     fuzzers.insert(0, Core())  # Main fuzzer
     return fuzzers

@@ -22,6 +22,7 @@ exploit_strategy = 0.2
 ascii_type = 0.3
 binary_type = 0.3
 
+#None means just 1
 [power_schedule]
 #explore = 1
 fast = 0

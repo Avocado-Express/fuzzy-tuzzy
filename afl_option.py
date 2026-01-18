@@ -78,7 +78,7 @@ class TypeName(StrEnum):
     BINARY = "binary"
 
 
-class Type(AFLOption):
+class TypeOption(AFLOption):
     is_environment_variable: bool = False
     type_name: TypeName
 
@@ -106,4 +106,8 @@ class Schedule(AFLOption):
         return f"-p {self.schedule_name}"
 
     def get_all_schedules() -> list['Schedule']:
-        return [Schedule(schedule_name=s) for s in ScheduleName]
+        ret = []
+        for s in ScheduleName:
+            ret.append(Schedule(schedule_name=s))
+
+        return ret
