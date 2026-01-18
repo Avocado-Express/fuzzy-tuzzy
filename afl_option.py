@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from pathlib import Path
 from typing import Optional
 
+from enum import StrEnum
 
 BINARY_NAMES = ['normal', 'san1', 'san2', 'san3']
 
@@ -56,29 +57,53 @@ class DisableTrimming(AFLOption):
         return 'AFL_DISABLE_TRIM=1'
 
 
-class ExploreStrategy(AFLOption):
+class Strategy(AFLOption):
     is_environment_variable: bool = False
+    strategy_name: str
 
     def get_string(self) -> str:
-        return '-P explore'
+        return f'-P {self.strategy_name}'
 
 
-class ExploitStrategy(AFLOption):
+class ExploreStrategy(Strategy):
+    strategy_name: str = 'explore'
+
+
+class ExploitStrategy(Strategy):
+    strategy_name: str = 'exploit'
+
+
+class TypeName(StrEnum):
+    ASCII = "ascii"
+    BINARY = "binary"
+
+
+class Type(AFLOption):
     is_environment_variable: bool = False
+    type_name: TypeName
 
     def get_string(self) -> str:
-        return '-P exploit'
+        return f'-t {self.type_name}'
 
 
-class AsciiType(AFLOption):
+class ScheduleName(StrEnum):
+    EXPLORE = "explore"
+    FAST = "fast"
+    EXPLOIT = "exploit"
+    SEEK = "seek"
+    RARE = "rare"
+    MMOPT = "mmopt"
+    COE = "coe"
+    LIN = "lin"
+    QUAD = "quad"
+
+
+class Schedule(AFLOption):
     is_environment_variable: bool = False
+    schedule_name: ScheduleName
 
     def get_string(self) -> str:
-        return '-a ascii'
+        return f"-p {self.schedule_name}"
 
-
-class BinaryType(AFLOption):
-    is_environment_variable: bool = False
-
-    def get_string(self) -> str:
-        return '-a binary'
+    def get_all_schedules() -> list['Schedule']:
+        return [Schedule(schedule_name=s) for s in ScheduleName]

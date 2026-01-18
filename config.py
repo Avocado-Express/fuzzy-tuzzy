@@ -33,11 +33,14 @@ class SecondaryOptions(BaseModel):
 
 class PowerSchedule(BaseModel):
     explore: Optional[float] = Percentage
+    fast: Optional[float] = Percentage
+    exploit: Optional[float] = Percentage
+    seek: Optional[float] = Percentage
+    rare: Optional[float] = Percentage
+    mmopt: Optional[float] = Percentage
     coe: Optional[float] = Percentage
     lin: Optional[float] = Percentage
     quad: Optional[float] = Percentage
-    exploit: Optional[float] = Percentage
-    rare: Optional[float] = Percentage
 
 
 class TOMLConfig(BaseSettings):

@@ -24,8 +24,11 @@ binary_type = 0.3
 
 [power_schedule]
 #explore = 1
+fast = 0
+#exploit = 1
+seek = 0
+#rare = 1
+mmopt = 0
 #coe = 1
 #lin = 1
 #quad = 1
-#exploit = 1
-#rare = 1

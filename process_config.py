@@ -7,11 +7,16 @@ from afl_option import (
     MOptMutator,
     OldQueueCycle,
     DisableTrimming,
+    Strategy,
     ExploreStrategy,
     ExploitStrategy,
-    AsciiType,
-    BinaryType
+    Type,
+    TypeName,
+    Schedule,
+    ScheduleName
 )
+
+
 from random import choice, sample
 from pathlib import Path
 from typing import Optional
@@ -44,7 +49,8 @@ def process_config(config: TOMLConfig, arguments: Arguments) -> list[Core]:
         print("Why are trying to do this")
         exit(1)
 
-    fuzzers = [Core() for _ in range(cores)]
+    # First one is main, rest are secondary
+    fuzzers = [Core() for _ in range(cores - 1)]
 
     # Sanitisers
     if config.sanitisers:
@@ -96,8 +102,7 @@ def process_config(config: TOMLConfig, arguments: Arguments) -> list[Core]:
         i.options.append(ExploreStrategy())
 
     no_strategy_fuzzers = [f for f in fuzzers if
-                           not any(isinstance(opt, ExploreStrategy)
-                                   or isinstance(opt, ExploitStrategy)
+                           not any(isinstance(opt, Strategy)
                                    for opt in f.options)]
 
     exploit_cores = round(secondary_options.exploit_strategy * cores)
@@ -105,15 +110,37 @@ def process_config(config: TOMLConfig, arguments: Arguments) -> list[Core]:
         i.options.append(ExploitStrategy())
 
     for i in random_fuzzers_by_percent(secondary_options.ascii_type):
-        i.options.append(AsciiType())
-
+        i.options.append(Type(type_name=TypeName.ASCII))
     no_type_fuzzers = [f for f in fuzzers if
-                       not any(isinstance(opt, AsciiType)
-                               or isinstance(opt, BinaryType)
+                       not any(isinstance(opt, Type)
                                for opt in f.options)]
 
     binary_type_cores = round(secondary_options.binary_type * cores)
     for i in sample(no_type_fuzzers, k=binary_type_cores):
-        i.options.append(BinaryType())
+        i.options.append(Type(type_name=TypeName.BINARY))
 
+    def add_schedule(schedule: Schedule) -> list[Schedule]:
+        # Add schedules based on power schedule config
+
+        schedule_name = schedule.schedule_name
+        count = getattr(config.power_schedule, schedule_name)
+
+        if count is None or count == 0:
+            return []
+        elif count == 1:
+            return []
+        else:
+            count = round(count * cores)
+
+        return [Schedule(schedule_name=schedule_name) for _ in range(count)]
+
+    power_schedules: list[list[Schedule]] = []
+    for schedule in Schedule.get_all_schedules():
+        power_schedules.extend(add_schedule(schedule))
+
+    for fuzzer in sample(fuzzers, k=sum(len(s) for s in power_schedules)):
+        schedule_options = power_schedules.pop()
+        fuzzer.options.extend(schedule_options)
+
+    fuzzers.insert(0, Core())  # Main fuzzer
     return fuzzers
