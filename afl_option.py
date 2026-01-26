@@ -31,7 +31,7 @@ class CMPLOG(AFLOption):
     cmplog_options: Optional[str] = None
 
     def get_string(self) -> str:
-        if self.cmplog_options is None:
+        if self.cmplog_options == '':
             return "-c {}".format(self.cmplog_binary)
         return "-c {} -l {}".format(self.cmplog_binary, self.cmplog_options)
 
