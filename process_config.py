@@ -4,7 +4,6 @@ from afl_option import (
     SAND,
     AFLOption,
     CMPLOG,
-    MOptMutator,
     OldQueueCycle,
     DisableTrimming,
     Strategy,
@@ -88,8 +87,6 @@ def process_config(config: TOMLConfig, arguments: Arguments) -> list[Core]:
                 )
 
     secondary_options = config.secondary_options
-    for i in random_fuzzers_by_percent(secondary_options.MOpt_mutator):
-        i.options.append(MOptMutator())
 
     for i in random_fuzzers_by_percent(secondary_options.old_queue_cycle):
         i.options.append(OldQueueCycle())

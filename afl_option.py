@@ -36,13 +36,6 @@ class CMPLOG(AFLOption):
         return "-c {} -l {}".format(self.cmplog_binary, self.cmplog_options)
 
 
-class MOptMutator(AFLOption):
-    is_environment_variable: bool = False
-
-    def get_string(self) -> str:
-        return '-L 0'
-
-
 class OldQueueCycle(AFLOption):
     is_environment_variable: bool = False
 

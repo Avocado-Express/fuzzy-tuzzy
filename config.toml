@@ -12,7 +12,6 @@ cmplog = true
 cmplog_options = ["", "2AT", "3ATX"]
 
 [secondary_options]
-MOpt_mutator = 0.1
 old_queue_cycle = 0.1
 disable_trimming = 0.6
 
