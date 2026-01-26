@@ -39,7 +39,7 @@ def run_fuzzers(fuzzers: list[Core], arguments: Arguments) -> None:
 
         window.rename_window(window_name)
 
-        full_command = f"{env}afl-fuzz -i {fuzzer_name} {arguments.corpus} -o {arguments.output} {dictionary} {cmds}"
+        full_command = f"{env}afl-fuzz {fuzzer_name} -i {arguments.corpus} -o {arguments.output} {dictionary} {cmds} -- {arguments.binary_directory / 'normal'}"
         print(f"Running fuzzer with command: {full_command}")
 
         # full_command = f'clear;echo "{full_command}"'

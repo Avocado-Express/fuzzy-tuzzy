@@ -83,7 +83,7 @@ class TypeOption(AFLOption):
     type_name: TypeName
 
     def get_string(self) -> str:
-        return f'-t {self.type_name}'
+        return f'-a {self.type_name}'
 
 
 class ScheduleName(StrEnum):
