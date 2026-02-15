@@ -4,11 +4,7 @@ import libtmux
 
 
 def run_fuzzers(fuzzers: list[Core], arguments: Arguments) -> None:
-
-
     server = libtmux.Server()
-
-
     session = server.new_session(session_name='fuzzing', kill_session=True)
 
     is_main = True

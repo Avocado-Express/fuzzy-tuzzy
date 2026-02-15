@@ -4,7 +4,7 @@ from typing import Optional
 
 from enum import StrEnum
 
-BINARY_NAMES = ['normal', 'san1', 'san2', 'san3']
+BINARY_NAMES = ['san1', 'san2', 'san3']
 
 
 class AFLOption(BaseModel):
