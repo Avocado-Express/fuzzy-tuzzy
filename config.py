@@ -1,16 +1,13 @@
+from pathlib import Path
+from typing import Optional
 from pydantic import BaseModel, Field
 from pydantic_settings import (
     BaseSettings,
-    PydanticBaseSettingsSource,
     SettingsConfigDict,
-    TomlConfigSettingsSource
+    TomlConfigSettingsSource,
 )
-from typing import Tuple, Type, Optional
 
 # https://medium.com/@wihlarkop/how-to-load-configuration-in-pydantic-3693d0ee81a3
-
-Percentage = Field(None, ge=0, le=1)
-
 
 class Instrumentation(BaseModel):
     laf: bool
@@ -19,45 +16,54 @@ class Instrumentation(BaseModel):
 
 
 class SecondaryOptions(BaseModel):
-    MOpt_mutator: float = Percentage
+    MOpt_mutator: float | None = Field(None, ge=0, le=1)
 
-    old_queue_cycle: float = Percentage
-    disable_trimming: float = Percentage
+    old_queue_cycle: float | None = Field(None, ge=0, le=1)
+    disable_trimming: float | None = Field(None, ge=0, le=1)
 
-    explore_strategy: float = Percentage
-    exploit_strategy: float = Percentage
+    explore_strategy: float | None = Field(None, ge=0, le=1)
+    exploit_strategy: float | None = Field(None, ge=0, le=1)
 
-    ascii_type: float = Percentage
-    binary_type: float = Percentage
+    ascii_type: float | None = Field(None, ge=0, le=1)
+    binary_type: float | None = Field(None, ge=0, le=1)
 
 
 class PowerSchedule(BaseModel):
-    explore: Optional[float] = Percentage
-    fast: Optional[float] = Percentage
-    exploit: Optional[float] = Percentage
-    seek: Optional[float] = Percentage
-    rare: Optional[float] = Percentage
-    mmopt: Optional[float] = Percentage
-    coe: Optional[float] = Percentage
-    lin: Optional[float] = Percentage
-    quad: Optional[float] = Percentage
+    explore: float | None = Field(None, ge=0, le=1)
+    fast: float | None = Field(None, ge=0, le=1)
+    exploit: float | None = Field(None, ge=0, le=1)
+    seek: float | None = Field(None, ge=0, le=1)
+    rare: float | None = Field(None, ge=0, le=1)
+    mmopt: float | None = Field(None, ge=0, le=1)
+    coe: float | None = Field(None, ge=0, le=1)
+    lin: float | None = Field(None, ge=0, le=1)
+    quad: float | None = Field(None, ge=0, le=1)
 
 
 class TOMLConfig(BaseSettings):
-    model_config = SettingsConfigDict(toml_file="config.toml")
-
     sanitisers: bool
     instrumentation: Instrumentation
     secondary_options: SecondaryOptions
     power_schedule: PowerSchedule
 
+    model_config = SettingsConfigDict()
+
+    _toml_path: str = "config.toml"
+
     @classmethod
     def settings_customise_sources(
         cls,
-        settings_cls: Type[BaseSettings],
-        init_settings: PydanticBaseSettingsSource,
-        env_settings: PydanticBaseSettingsSource,
-        dotenv_settings: PydanticBaseSettingsSource,
-        file_secret_settings: PydanticBaseSettingsSource,
-    ) -> Tuple[PydanticBaseSettingsSource, ...]:
-        return (TomlConfigSettingsSource(settings_cls),)
+        settings_cls,
+        init_settings,
+        env_settings,
+        dotenv_settings,
+        file_secret_settings,
+    ):
+        return (
+            TomlConfigSettingsSource(settings_cls, cls._toml_path),
+        )
+
+    @classmethod
+    def from_toml(cls, path: Path):
+        cls._toml_path = path.absolute().as_posix()
+        return cls()

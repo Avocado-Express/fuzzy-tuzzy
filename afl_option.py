@@ -98,6 +98,7 @@ class Schedule(AFLOption):
     def get_string(self) -> str:
         return f"-p {self.schedule_name}"
 
+    @staticmethod
     def get_all_schedules() -> list['Schedule']:
         ret = []
         for s in ScheduleName:
